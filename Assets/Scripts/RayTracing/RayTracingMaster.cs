@@ -10,6 +10,14 @@ public class RayTracingMaster : MonoBehaviour
 
     public Texture SkyboxTexture;
 
+    private uint _currentSample = 0;
+    private Material _addMaterial;
+
+    [Range(0, 15)]
+    public int BouncesCount = 8;
+
+    public Light DirectionalLight;
+
     private void Awake()
     {
         _camera = GetComponent<Camera>();
@@ -21,7 +29,11 @@ public class RayTracingMaster : MonoBehaviour
         RayTracingShader.SetMatrix("_CameraToWorld", _camera.cameraToWorldMatrix);
         RayTracingShader.SetMatrix("_CameraInverseProjection", _camera.projectionMatrix.inverse);
 
+        RayTracingShader.SetVector("_PixelOffset", new Vector2(Random.value, Random.value));
+
         RayTracingShader.SetTexture(0, "_SkyboxTexture", SkyboxTexture);
+
+        RayTracingShader.SetInt("_Bounces", BouncesCount);
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
@@ -42,8 +54,14 @@ public class RayTracingMaster : MonoBehaviour
 
         RayTracingShader.Dispatch(0, threadGroupsX, threadGroupsY, 1);
 
+        // Blit the result texture to the screen
+    if (_addMaterial == null)
+        _addMaterial = new Material(Shader.Find("Hidden/AddShader"));
+        _addMaterial.SetFloat("_Sample", _currentSample);
+
         // Blit to screen
-        Graphics.Blit(_target, destination);
+        Graphics.Blit(_target, destination, _addMaterial);
+        _currentSample++;
     }
 
     private void InitRenderTexture()
@@ -68,6 +86,10 @@ public class RayTracingMaster : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (transform.hasChanged)
+        {
+            _currentSample = 0;
+            transform.hasChanged = false;
+        }
     }
 }

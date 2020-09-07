@@ -314,6 +314,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RayTracingShader: {fileID: 7200000, guid: 767ad026887d679458b157344a4a03ba, type: 3}
   SkyboxTexture: {fileID: 2800000, guid: 7a8d637a9f1c5524495cf0b8caa7277d, type: 3}
+  BouncesCount: 8
+  DirectionalLight: {fileID: 0}
 --- !u!114 &963194230
 MonoBehaviour:
   m_ObjectHideFlags: 0
